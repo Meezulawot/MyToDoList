@@ -3,14 +3,13 @@ import { View, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-n
 import Tasks from './Tasks';
 import Icon from 'react-native-vector-icons/dist/Feather'
 import Header from './Header';
-// import AddTask from './AddTask';
 
 export default function Main() {
 
     const [tasks, setTasks] = useState([])
     const [loading, setLoading] = useState(false)
     const [status, setStatus] = useState(0);
-    const [searchText, setSearchText] = useState('');
+    const [search, setSearch] = useState('');
 
     // const getTasks = () => {
     //     setLoading(true)
@@ -70,30 +69,23 @@ export default function Main() {
         }
     }
 
-    const searchItem = async (input) => {
-        try {
-            setLoading(true)
-            const response = await fetch('https://jsonplaceholder.typicode.com/todos');
-            const json = await response.json();
-            const data = json.filter((item) => {
-                item.title.toLowerCase()
-                .includes(input.toLowerCase())
-            })
-            setSearchText(data);
-            console.log(data)
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
+    const searchItem = (text) => {
+        if(text){
+
+            const searchTask = tasks.filter((item) => {
+                const itemData = item.title.toUpperCase();
+                const textData = text.toUpperCase();
+                return itemData.indexOf(textData)> -1;
+            });
+            
+            setTasks(searchTask)
+            setSearch(text)
+            
+        }else{
+            setTasks(tasks);
+            setSearch(text);
         }
     }
-
-    // const searchItem = (input) => {
-    //     let searchText = tasks.filter((item) => {
-    //         item.title.toLowerCase().includes(input.toLowerCase());
-    //     });
-    //     setSearchText(searchText)
-    // }
 
     return (
         <View style={styles.wrapper} >
@@ -107,7 +99,7 @@ export default function Main() {
                     style={styles.textInput}
                     placeholder='Search by title'
                     underlineColorAndroid='black'
-                    value={searchText}
+                    value={search}
                     onChangeText={(input) => { searchItem(input) }}/>
 
                 <TouchableOpacity style={styles.addButton}>
